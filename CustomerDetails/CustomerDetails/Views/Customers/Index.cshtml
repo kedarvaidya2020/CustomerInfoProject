@@ -1,0 +1,84 @@
+﻿@model IEnumerable<CustomerDetails.Models.Customer>
+
+    <table id="customers" class="table table-bordered table-hover">
+
+        <thead>
+            <tr>
+                <th>FirstName</th>
+                <th>LastName</th>
+                <th>Email</th>
+                <th>PhoneNumber</th>
+                <th>Edit</th>
+                <th>Delete</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+            </table>
+    <p>
+        @Html.ActionLink("Add New Customer", "New")
+    </p>
+@section scripts
+{
+    <script>
+        $(document).ready(function () {
+            var table = $("#customers").DataTable({
+                ajax: {
+                    url: "/api/customers/",
+                    dataSrc: ""
+                },
+                columns: [
+                    {
+                        data: "FirstName"
+
+                    },
+                    {
+                        data: "LastName"
+                    },
+                    {
+                        data: "Email"
+                    },
+                    {
+                        data: "PhoneNumber"
+                    },
+                    {
+                        data: "Id",
+                        render: function (data, type, customer) {
+                            return "<a href='/customers/details/" + data + "'>Edit</a>";
+                        }
+                    },
+                    {
+                        data: "Id",
+                        render: function (data) {
+                            return "<button class='btn-link js-delete' data-customer-id=" + data + ">Delete</button>";
+                        }
+                    }
+                ]
+            });
+            //$.ajax({
+            //    url: "/api/customers/",
+            //    method: "GET",
+            //    contentType: "application/json",
+            //    dataType: 'json',
+            //    success: function (result) {
+
+            //        console.log(result);
+            //    }
+            //})
+            ////
+            $("#customers").on("click", ".js-delete", function () {
+                var button = $(this);
+                if (confirm("Are you sure you want to delete record?")) {
+                    $.ajax({
+                        url: "/api/customers/" + button.attr("data-customer-id"),
+                        method: "DELETE",
+                        success: function () {
+                            //datatable methods for removing record from table
+                            table.row(button.parents("tr")).remove().draw();
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+}
